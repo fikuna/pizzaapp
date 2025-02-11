@@ -26,5 +26,4 @@ class PizzaForm(forms.ModelForm):
 class DeliveryForm(forms.ModelForm):
     class Meta:
         model = Delivery
-        fields = ['name', 'address', 'cvv', 'card_number', 'expiryMonth', 'expiryYear']
-        
+        fields = ['name', 'address', 'cardNo', 'expMonth', 'expYear', 'cvv']
