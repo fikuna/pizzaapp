@@ -98,7 +98,7 @@ class Pizza(models.Model):
 ##### DELIVERY CONFIG
 
 # the month choices 
-MONTH = (
+MONTHS = (
     ("January", "January"),
     ("February", "February"),
     ("March", "March"),
@@ -114,7 +114,7 @@ MONTH = (
 )
 
 # year choices 
-YEAR_CHOICES = tuple((year, year) for year in range(2022, 2050))
+YEARS = tuple((year, year) for year in range(2022, 2050))
 
 class Delivery(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -122,7 +122,7 @@ class Delivery(models.Model):
     address = models.CharField(max_length=200)
     cardNo = models.IntegerField()
     expMonth = models.CharField(max_length=15, choices=MONTHS, default='January')
-    expYear = models.IntegerField(choices=YEAR_CHOICES, default=2025)
+    expYear = models.IntegerField(choices=YEARS, default=2025)
     cvv = models.IntegerField()
 
     def __str__(self):
