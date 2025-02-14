@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Ordering System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #dc3545;
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-primary:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+        .hero-section {
+            background: url('https://via.placeholder.com/1200x400') no-repeat center center/cover;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        .order-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Pizza Ordering System</a>
+            <div class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'create_pizza' %}">Create New Order</a>
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div>
+            <h1>Welcome to the Pizza Ordering System</h1>
+            <p>Order your favorite pizza online!</p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">Sign Up</a>
+                <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Login</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        {% if user.is_authenticated %}
+            <h2>Welcome back, {{ user.username }}!</h2>
+            <p>Here are your previous orders:</p>
+
+            <!-- Previous Orders -->
+            <div class="row">
+                {% for pizza in pizzas %}
+                    <div class="col-md-6">
+                        <div class="order-card">
+                            <h3>Order #{{ pizza.id }}</h3>
+                            <p><strong>Size:</strong> {{ pizza.size }}</p>
+                            <p><strong>Crust:</strong> {{ pizza.crust }}</p>
+                            <p><strong>Sauce:</strong> {{ pizza.sauce }}</p>
+                            <p><strong>Cheese:</strong> {{ pizza.cheese }}</p>
+                            <p><strong>Toppings:</strong> 
+                                {% for topping in pizza.toppings.all %}
+                                    {{ topping.topping }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p><strong>Date:</strong> {{ pizza.date }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col">
+                        <p>No previous orders found.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Create New Order Button -->
+            <div class="text-center mt-4">
+                <a href="{% url 'create_pizza' %}" class="btn btn-primary btn-lg">Create New Order</a>
+            </div>
+        {% else %}
+            <h2>Get Started</h2>
+            <p>Sign up or log in to start ordering your favorite pizzas!</p>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
