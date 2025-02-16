@@ -1,119 +1,116 @@
+
 {% extends 'base.html' %}
+{% load widget_tweaks %}
+
 
 {% block content %}
-
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
-
 <style>
-    /* Apply Kanit font to the entire body */
-    body {
-        font-family: 'Kanit', sans-serif;
-        background-color: #f8f9fa; /* Light background */
-    }
+    /* General Styles */
 
-    /* Container and card styling */
+    body {
+
+        background-color: #f8f9fa;
+        font-family: 'Kanit', sans-serif;
+    }
+    
     .container {
         margin-top: 50px;
     }
-
+    
     .card {
         border: none;
         border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-
+    
     .card-header {
         background-color: #e83e8c; /* Pink color */
         color: white;
         padding: 20px;
         text-align: center;
     }
-
+    
     .card-header h3 {
         margin: 0;
-        font-family: 'Kanit', sans-serif;
-        font-weight: 700; /* Bold weight */
+        font-weight: bold;
     }
-
+    
     .card-body {
         padding: 30px;
     }
-
-    .card-footer {
-        background-color: #f8f9fa; /* Light background */
-        border-top: 1px solid #e9ecef;
-        padding: 15px;
-        text-align: center;
-    }
-
-    .card-footer a {
-        color: #e83e8c; /* Pink color for links */
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-    .card-footer a:hover {
-        text-decoration: underline;
-    }
-
-    /* Form styling */
+    
     .form-label {
         font-weight: bold;
         margin-bottom: 10px;
         display: block;
-        color: #495057; /* Dark gray for labels */
     }
-
-    .form-control {
+    
+    .form-select, .form-check-input {
         width: 100%;
         padding: 10px;
         border-radius: 5px;
         border: 1px solid #ced4da;
         margin-bottom: 20px;
-        font-family: 'Kanit', sans-serif;
     }
-
-    .form-control:focus {
+    
+    .form-select:focus, .form-check-input:focus {
         border-color: #e83e8c; /* Pink color */
         outline: 0;
         box-shadow: 0 0 0 0.2rem rgba(232, 62, 140, 0.25); /* Pink color with transparency */
     }
+    
+    .form-check {
+        margin-bottom: 10px;
+    }
+    
+    .form-check-label {
+        margin-left: 10px;
+        font-weight: normal;
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 30px;
+    }
 
-    /* Error messages */
+    .button-container .btn {
+        min-width: 150px;
+        padding: 12px 24px;
+        font-weight: 600;
+    }
     .alert-danger {
-        background-color: #f8d7da; /* Light red for errors */
+        background-color: #f8d7da;
         border-color: #f5c6cb;
-        color: #721c24; /* Dark red for text */
+        color: #721c24;
         padding: 10px;
         border-radius: 5px;
         margin-bottom: 20px;
     }
-
-    /* Button styling */
+    
     .btn-primary {
         background-color: #e83e8c; /* Pink color */
         border: none;
         padding: 10px;
         border-radius: 5px;
         font-size: 16px;
-        font-family: 'Kanit', sans-serif;
-        font-weight: 500; /* Medium weight */
+        font-weight: bold;
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
-
+    
     .btn-primary:hover {
         background-color: #c8236d; /* Darker pink for hover */
     }
-
-    /* Responsive styles */
+    
+    /* Responsive Styles */
     @media (max-width: 768px) {
-        .col-md-6 {
+        .col-md-4 {
             flex: 0 0 100%;
             max-width: 100%;
         }
-
+    
         .card-body {
             padding: 20px;
         }
@@ -121,33 +118,49 @@
 </style>
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Create Your Pizza Account</h3>
+                    <h3 class="mb-0">Create Your Pizza</h3>
                 </div>
                 <div class="card-body">
                     <form method="POST">
                         {% csrf_token %}
                         
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" name="username" class="form-control" required>
+                            <label class="form-label">Size</label>
+                            {{ form.size|add_class:"form-select" }}
                         </div>
 
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" required>
+                            <label class="form-label">Crust</label>
+                            {{ form.crust|add_class:"form-select" }}
                         </div>
 
                         <div class="mb-3">
-                            <label for="password1" class="form-label">Password</label>
-                            <input type="password" name="password1" class="form-control" required>
+                            <label class="form-label">Sauce</label>
+                            {{ form.sauce|add_class:"form-select" }}
                         </div>
 
                         <div class="mb-3">
-                            <label for="password2" class="form-label">Confirm Password</label>
-                            <input type="password" name="password2" class="form-control" required>
+                            <label class="form-label">Cheese</label>
+                            {{ form.cheese|add_class:"form-select" }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Toppings</label>
+                            <div class="row px-3">
+                                {% for topping in toppings %}
+                                <div class="col-md-4">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="toppings" value="{{ topping.id }}" id="topping_{{ topping.id }}">
+                                        <label class="form-check-label" for="topping_{{ topping.id }}">
+                                            {{ topping.topping }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
                         </div>
 
                         {% if form.errors %}
@@ -160,11 +173,12 @@
                             </div>
                         {% endif %}
 
-                        <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+                        
+                        <div class="button-container">
+                            <button type="submit" class="btn btn-primary">Create Pizza</button>
+                            <a href="{% url 'index' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
                     </form>
-                </div>
-                <div class="card-footer text-center">
-                    <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
                 </div>
             </div>
         </div>

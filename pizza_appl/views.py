@@ -9,12 +9,12 @@ from .models import *
 from .forms import *
 
 def index(request):
-    toppings = Toppings.objects.all()
     if request.user.is_authenticated:
-        pizzas = Pizza.objects.filter(author=request.user)
-    else:
-        pizzas = []
-    return render(request, 'index.html', {'pizzas':pizzas, 'user':request.user}, {'toppings':toppings})
+        # Use prefetch_related for the many-to-many relationship
+        pizzas = Pizza.objects.filter(author=request.user).prefetch_related('toppings').order_by('-date')
+        return render(request, 'index.html', {'pizzas': pizzas})
+    return render(request, 'index.html')
+
 
 def signup(request):
     if request.method == "POST":
@@ -46,8 +46,10 @@ def create_order(request):
             pizza = form.save(commit=False)
             pizza.author = request.user
             pizza.save()
+            form.save_m2m()
+            print(f"Pizza toppimgs: {pizza.toppings.all()}")
             request.session['pending_pizza_id'] = pizza.id
-            return redirect('/delivery')
+            return redirect('delivery')
         else:
             return render(request, 'order.html', {'form': form, "toppings": toppings})
 
@@ -57,9 +59,6 @@ def create_order(request):
 
 def delivery_page(request):
     pizza_id = request.session.get('pending_pizza_id')
-    if not pizza_id:
-        messages.error(request, "Please create a pizza order first")
-        return redirect('order')
 
     if request.method == 'POST':
         form = DeliveryForm(request.POST)
@@ -67,7 +66,7 @@ def delivery_page(request):
             delivery = form.save(commit=False)
             delivery.author = request.user
             
-            # Connect the pizza to this delivery
+            # connect the pizza to this delivery
             pizza = Pizza.objects.get(id=pizza_id)
             delivery.pizza = pizza
             delivery.save()
@@ -84,4 +83,8 @@ def delivery_page(request):
 
 def orders_page(request):
     deliveries = Delivery.objects.filter(author=request.user)
-    return render(request, 'user_orders.html', {'deliveries': deliveries})
+    return render(request, 'order_view.html', {'deliveries': deliveries})
+
+@login_required
+def profile_view(request):
+    return redirect('index')  # This will redirect to your homepage after login

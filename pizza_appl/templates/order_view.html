@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Your Previous Orders</h3>
+                </div>
+                <div class="card-body">
+                    {% if deliveries %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order Date</th>
+                                        <th>Pizza Details</th>
+                                        <th>Delivery Address</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for delivery in deliveries %}
+                                    <tr>
+                                        <td>{{ delivery.pizza.date|date:"M d, Y" }}</td>
+                                        <td>
+                                            <strong>Size:</strong> {{ delivery.pizza.size }}<br>
+                                            <strong>Crust:</strong> {{ delivery.pizza.crust }}<br>
+                                            <strong>Toppings:</strong> 
+                                            {% for topping in delivery.pizza.toppings.all %}
+                                                {{ topping.topping }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ delivery.address }}</td>
+                                        <td><span class="badge bg-success">Delivered</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center">
+                            <h4>No orders yet!</h4>
+                            <a href="{% url 'create_pizza' %}" class="btn btn-primary mt-3">Order Your First Pizza</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
