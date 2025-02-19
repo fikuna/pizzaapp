@@ -109,9 +109,11 @@ body {
                 <div class="card-body">
                     {% if messages %}
                         {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}">
+                            {% if message.tags == 'success'%}
+                            <div class="alert alert-success">
                                 {{ message }}
                             </div>
+                            {% endif %}
                         {% endfor %}
                     {% endif %}
 

@@ -10,7 +10,6 @@ from .forms import *
 
 def index(request):
     if request.user.is_authenticated:
-        # Use prefetch_related for the many-to-many relationship
         pizzas = Pizza.objects.filter(author=request.user).prefetch_related('toppings').order_by('-date')
         return render(request, 'index.html', {'pizzas': pizzas})
     return render(request, 'index.html')
@@ -22,60 +21,77 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-        return redirect('index')
+            return redirect('index')
     else:
         form = RegisterForm()
     return render(request, 'register.html', {'form':form})
 
-class LoginView(LoginView):
-    template_name = 'login.html'
-       
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            messages.success(request, f'Welcome back {username}!')
+            return redirect('index')
+        else:
+            messages.error(request, 'Invalid credentials')
+            
+    return render(request, 'login.html')
+
     
 def log_out(request):
     logout(request)
     return redirect('index')
-@login_required(login_url='index')
-
+@login_required(login_url='/login')
 def create_order(request):
     toppings = Toppings.objects.all()
 
     if request.method == 'POST':
         form = PizzaForm(request.POST)
-
         if form.is_valid():
             pizza = form.save(commit=False)
             pizza.author = request.user
             pizza.save()
             form.save_m2m()
-            print(f"Pizza toppimgs: {pizza.toppings.all()}")
-            request.session['pending_pizza_id'] = pizza.id
+
+            pending_pizza_ids = request.session.get('pending_pizza_ids', [])
+            pending_pizza_ids.append(pizza.id)
+            request.session['pending_pizza_ids'] = pending_pizza_ids
+            
             return redirect('delivery')
-        else:
-            return render(request, 'order.html', {'form': form, "toppings": toppings})
 
     else:
-        form = PizzaForm()
-        return render(request, 'order.html', {'form': form, "toppings": toppings})
+     form = PizzaForm()
+    return render(request, 'order.html', {'form': form, "toppings": toppings})
 
+@login_required(login_url='/login')
 def delivery_page(request):
-    pizza_id = request.session.get('pending_pizza_id')
+    pizza_ids = request.session.get('pending_pizza_ids', [])
+    if not pizza_ids:
+        return redirect('create_pizza')
 
     if request.method == 'POST':
         form = DeliveryForm(request.POST)
         if form.is_valid():
             delivery = form.save(commit=False)
             delivery.author = request.user
-            
-            # connect the pizza to this delivery
-            pizza = Pizza.objects.get(id=pizza_id)
-            delivery.pizza = pizza
             delivery.save()
             
-            # Clear the pending pizza from session
-            del request.session['pending_pizza_id']
+            # Associate each pizza with the delivery
+            for pizza_id in pizza_ids:
+                pizza = Pizza.objects.get(id=pizza_id)
+                pizza.delivery = delivery  # Set the delivery field
+                pizza.save()
             
-            messages.success(request, "Order has been placed successfully!")
-            return redirect('/')
+            # Store the delivery ID in the session
+            request.session['latest_delivery_id'] = delivery.id
+            
+            del request.session['pending_pizza_ids']
+            return redirect('order_confirmation')
     else:
         form = DeliveryForm()
     
@@ -87,4 +103,23 @@ def orders_page(request):
 
 @login_required
 def profile_view(request):
-    return redirect('index')  # This will redirect to your homepage after login
+    orders = Pizza.objects.all().filter(author=request.user)
+
+    return render(request, 'profile.html', {'orders' : orders})
+@login_required(login_url='/login')
+@login_required(login_url='/login')
+def order_confirmation(request):
+    try:
+        # Get the most recent delivery for this user
+        delivery = Delivery.objects.filter(author=request.user).latest('id')
+        # Get the associated pizza with all its toppings
+        pizza = Pizza.objects.filter(author=request.user).prefetch_related('toppings').latest('date')
+        
+        context = {
+            'delivery': delivery,
+            'pizza': pizza
+        }
+        
+        return render(request, 'order_view.html', context)
+    except (Delivery.DoesNotExist, Pizza.DoesNotExist):
+        return redirect('create_pizza')

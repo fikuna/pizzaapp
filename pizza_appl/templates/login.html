@@ -4,7 +4,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <style>
-    /* Apply Kanit font to the entire body */
     body {
         font-family: 'Kanit', sans-serif;
         background-color: #f8f9fa; /* Light background */
@@ -12,14 +11,15 @@
 
     /* Container and card styling */
     .container {
-        margin-top: 50px;
+        margin-top: 80px;
     }
 
     .card {
         border: none;
-        border-radius: 10px;
+        border-radius: 15px;
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background 
     }
 
     .card-header {
@@ -128,17 +128,14 @@
                 <div class="card-body">
                     <form method="POST">
                         {% csrf_token %}
-                        
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
                             <input type="text" name="username" class="form-control" required>
                         </div>
-
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" name="password" class="form-control" required>
                         </div>
-
                         {% if form.errors %}
                             <div class="alert alert-danger">
                                 <p>Your username and password didn't match. Please try again.</p>

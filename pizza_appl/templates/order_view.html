@@ -1,53 +1,99 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Your Previous Orders</h3>
-                </div>
-                <div class="card-body">
-                    {% if deliveries %}
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Order Date</th>
-                                        <th>Pizza Details</th>
-                                        <th>Delivery Address</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for delivery in deliveries %}
-                                    <tr>
-                                        <td>{{ delivery.pizza.date|date:"M d, Y" }}</td>
-                                        <td>
-                                            <strong>Size:</strong> {{ delivery.pizza.size }}<br>
-                                            <strong>Crust:</strong> {{ delivery.pizza.crust }}<br>
-                                            <strong>Toppings:</strong> 
-                                            {% for topping in delivery.pizza.toppings.all %}
-                                                {{ topping.topping }}{% if not forloop.last %}, {% endif %}
-                                            {% endfor %}
-                                        </td>
-                                        <td>{{ delivery.address }}</td>
-                                        <td><span class="badge bg-success">Delivered</span></td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="text-center">
-                            <h4>No orders yet!</h4>
-                            <a href="{% url 'create_pizza' %}" class="btn btn-primary mt-3">Order Your First Pizza</a>
-                        </div>
-                    {% endif %}
-                </div>
+
+<style>
+    .confirmation-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .confirmation-header {
+        text-align: center;
+        color: #ff4081;
+        margin-bottom: 30px;
+    }
+
+    .order-details {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 6px rgba(255, 64, 129, 0.1);
+    }
+
+    .section {
+        background: #fce4ec;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        color: #ff4081;
+        margin-bottom: 20px;
+    }
+
+    .detail-row {
+        display: flex;
+        margin: 10px 0;
+        padding: 8px;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .label {
+        font-weight: bold;
+        color: #ff4081;
+        width: 150px;
+    }
+</style>
+
+<div class="confirmation-container">
+    <div class="confirmation-header">
+        <h1>Order Confirmation</h1>
+    </div>
+
+    <div class="order-details">
+        <div class="section">
+            <h2>Pizza Details</h2>
+            <div class="detail-row">
+                <span class="label">Size:</span>
+                <span>{{ pizza.size }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Crust:</span>
+                <span>{{ pizza.crust }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Toppings:</span>
+                <span>
+                    {% for topping in pizza.toppings.all %}
+                        {{ topping.topping }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Delivery Details</h2>
+            <div class="detail-row">
+                <span class="label">Name:</span>
+                <span>{{ delivery.name }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Address:</span>
+                <span>{{ delivery.address }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Card Number:</span>
+                <span>**** **** **** {{ delivery.cardNo|slice:"-4" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Order Date:</span>
+                <span>{{ pizza.date }}</span>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}

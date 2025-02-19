@@ -12,28 +12,28 @@ class Toppings(models.Model):
 class Pizza(models.Model):
     
   sizes_choices = [
-    ('small', 'Small'),
-    ('medium', 'Medium'),
-    ('large', 'Large')
+    ('Small', 'Small'),
+    ('Medium', 'Medium'),
+    ('Large', 'Large')
 ]
 
   crusts_choices = [
-    ('normal', 'Normal'),
-    ('thin', 'Thin'),
-    ('gluten free', 'Gluten Free'),
-    ('thick', 'Thick')
+    ('Normal', 'Normal'),
+    ('Thin', 'Thin'),
+    ('Gluten Free', 'Gluten Free'),
+    ('Thick', 'Thick')
     
 ]
 
   cheese_choices= [
-    ('mozzarella', 'Mozzarella'),
-    ('vegan', 'Vegan'),
-    ('low fat', 'Low Fat')
+    ('Mozzarella', 'Mozzarella'),
+    ('Vegan', 'Vegan'),
+    ('Low Fat', 'Low Fat')
 ]
 
   sauce_choices = [
-    ('tomato', 'Tomato'),
-    ('bbq', 'BBQ')
+    ('Tomato', 'Tomato'),
+    ('BBQ', 'BBQ')
 ]
 
   pizzaSizes = tuple(sizes_choices)
@@ -76,6 +76,7 @@ YEAR_CHOICES = tuple((year, year) for year in range(2022, 2050))
 
 class Delivery(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    pizza = models.OneToOneField(Pizza, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=200)
     cardNo = models.CharField(max_length=16)
